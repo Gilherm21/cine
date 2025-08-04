@@ -1,14 +1,15 @@
 package service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import exception.IngressoException;
 import model.Cliente;
 import model.Ingresso;
 import model.Produto;
 import model.Sessao;
 import model.Venda;
-import exception.IngressoException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 public class VendaService {
     private final List<Venda> vendas = new ArrayList<>();

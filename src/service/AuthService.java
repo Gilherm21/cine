@@ -1,12 +1,11 @@
 package service;
 
-import model.Administrador;
-import model.Cliente;
-import model.Usuario;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import model.Administrador;
+import model.Usuario;
 
 public class AuthService {
 

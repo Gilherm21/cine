@@ -1,15 +1,16 @@
 package service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import exception.IngressoException;
 import model.Filme;
 import model.Ingresso;
-import model.Sessao;
 import model.Sala;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.time.LocalDateTime;
-import java.util.UUID;
+import model.Sessao;
 
 public class IngressoService {
 

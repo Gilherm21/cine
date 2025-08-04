@@ -1,9 +1,10 @@
 package service;
 
-import exception.ClienteException;
-import model.Cliente;
 import java.util.ArrayList;
 import java.util.List;
+
+import exception.ClienteException;
+import model.Cliente;
 
 public class ClienteService {
     private final List<Cliente> clientes = new ArrayList<>();
