@@ -1,0 +1,6 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "c:\\Users\\gilbe\\OneDrive\\Área de Trabalho\\h2\\bin\\h2-2.3.230.jar"
+    ]
+}

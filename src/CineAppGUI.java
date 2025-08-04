@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,6 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
@@ -24,6 +26,7 @@ import model.Administrador;
 import model.Cliente;
 import model.Filme;
 import model.Funcionario;
+import model.IImprimivel;
 import model.Ingresso;
 import model.Produto;
 import model.Sessao;
@@ -199,8 +202,8 @@ public class CineAppGUI {
         JButton btnGerenciarFunc = new JButton("Gerenciar Funcionários");
         btnGerenciarFunc.addActionListener(e -> mostrarDialogoGerenciarFuncionarios());
 
-        JButton btnTestarInterface = new JButton("Ver Detalhes (Interface)");
-        btnTestarInterface.addActionListener(e -> mostrarDialogoDetalhesInterface());
+        JButton btnVisualizador = new JButton("Visualizador de Entidades");
+        btnVisualizador.addActionListener(e -> mostrarVisualizadorDeDetalhes());
 
         JButton btnLogout = new JButton("Logout");
         btnLogout.addActionListener(e -> logout());
@@ -210,31 +213,57 @@ public class CineAppGUI {
         panel.add(btnGerenciarFunc);
         panel.add(btnGerarRelatorios);
         panel.add(btnValidarIngresso);
-        panel.add(btnTestarInterface);
+        panel.add(btnVisualizador);
         panel.add(new JLabel());
         panel.add(btnLogout);
         
         mostrarPainel(panel);
     }
 
-    private void mostrarDialogoDetalhesInterface() {
-        try {
-            Filme filme = filmeService.buscarPorId(1L);
-            Funcionario funcionario = funcionarioService.buscarPorId(1L);
+    private <T extends IImprimivel> JPanel criarPainelVisualizador(List<T> itens) {
+        JPanel painel = new JPanel(new BorderLayout(10, 10));
+        
+        DefaultListModel<T> listModel = new DefaultListModel<>();
+        itens.forEach(listModel::addElement);
+        
+        JList<T> lista = new JList<>(listModel);
+        lista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
+        JTextArea areaDetalhes = new JTextArea("Selecione um item da lista para ver os detalhes.");
+        areaDetalhes.setEditable(false);
+        areaDetalhes.setWrapStyleWord(true);
+        areaDetalhes.setLineWrap(true);
+        
+        lista.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                T selecionado = lista.getSelectedValue();
+                if (selecionado != null) {
+                    areaDetalhes.setText(selecionado.getDetalhesFormatados());
+                }
+            }
+        });
+        
+        JScrollPane scrollLista = new JScrollPane(lista);
+        scrollLista.setPreferredSize(new Dimension(200, 0));
+        
+        painel.add(scrollLista, BorderLayout.WEST);
+        painel.add(new JScrollPane(areaDetalhes), BorderLayout.CENTER);
+        
+        return painel;
+    }
 
-            String detalhesFilme = filme.getDetalhesFormatados();
-            String detalhesFuncionario = funcionario.getDetalhesFormatados();
+    private void mostrarVisualizadorDeDetalhes() {
+        JDialog visualizadorDialog = new JDialog(frame, "Visualizador de Entidades", true);
+        visualizadorDialog.setSize(700, 500);
+        visualizadorDialog.setLocationRelativeTo(frame);
 
-            String mensagemFinal = detalhesFilme + "\n\n" + detalhesFuncionario;
-
-            JTextArea textArea = new JTextArea(mensagemFinal);
-            textArea.setEditable(false);
-            JScrollPane scrollPane = new JScrollPane(textArea);
-            JOptionPane.showMessageDialog(frame, scrollPane, "Detalhes (via Interface IImprimivel)", JOptionPane.INFORMATION_MESSAGE);
-
-        } catch (Exception e) {
-             JOptionPane.showMessageDialog(frame, "Erro ao buscar dados para exibição: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-        }
+        JTabbedPane abas = new JTabbedPane();
+        
+        abas.addTab("Filmes", criarPainelVisualizador(filmeService.listar()));
+        abas.addTab("Funcionários", criarPainelVisualizador(funcionarioService.listar()));
+        
+        visualizadorDialog.add(abas);
+        visualizadorDialog.setVisible(true);
     }
 
     private void mostrarPainelCartaz() {
