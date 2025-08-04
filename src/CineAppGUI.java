@@ -1,5 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -86,11 +88,13 @@ public class CineAppGUI {
         filmeService.adicionarInicial("Bad Boys: Até o Fim", "Os detetives Mike Lowrey e Marcus Burnett investigam a corrupção.", 115, "Ação", 16);
         filmeService.adicionarInicial("Planeta dos Macacos: O Reinado", "Muitas gerações após o reinado de César.", 145, "Ficção Científica", 14);
         
-        ingressoService.cadastrarSessao(1L, 1L, LocalDateTime.now().plusHours(2));
-        ingressoService.cadastrarSessao(1L, 2L, LocalDateTime.now().plusHours(4));
-        ingressoService.cadastrarSessao(2L, 3L, LocalDateTime.now().plusHours(3));
-        ingressoService.cadastrarSessao(3L, 4L, LocalDateTime.now().plusHours(1));
-        ingressoService.cadastrarSessao(4L, 1L, LocalDateTime.now().plusHours(5));
+        if (ingressoService.listarSessoes().isEmpty()) {
+            ingressoService.cadastrarSessao(1L, 1L, LocalDateTime.now().plusHours(2));
+            ingressoService.cadastrarSessao(1L, 2L, LocalDateTime.now().plusHours(4));
+            ingressoService.cadastrarSessao(2L, 3L, LocalDateTime.now().plusHours(3));
+            ingressoService.cadastrarSessao(3L, 4L, LocalDateTime.now().plusHours(1));
+            ingressoService.cadastrarSessao(4L, 1L, LocalDateTime.now().plusHours(5));
+        }
     }
 
     private void initialize() {
@@ -414,7 +418,7 @@ public class CineAppGUI {
         }
     }
     
-    private void mostrarDialogoGerenciarFuncionarios() {
+private void mostrarDialogoGerenciarFuncionarios() {
         JDialog dialog = new JDialog(frame, "Gerenciar Funcionários", true);
         dialog.setSize(600, 400);
         dialog.setLayout(new BorderLayout(10, 10));
@@ -433,17 +437,22 @@ public class CineAppGUI {
             String nome = JOptionPane.showInputDialog(dialog, "Nome do funcionário:");
             String funcao = JOptionPane.showInputDialog(dialog, "Função do funcionário:");
             if (nome != null && !nome.isBlank() && funcao != null && !funcao.isBlank()) {
-                funcionarioService.adicionar(nome, funcao);
+                // CORREÇÃO AQUI: Criamos o objeto antes de o passar para o serviço
+                Funcionario novoFuncionario = new Funcionario(0L, nome, funcao);
+                funcionarioService.adicionar(novoFuncionario);
+                
                 listModel.clear();
                 funcionarioService.listar().forEach(listModel::addElement);
+                JOptionPane.showMessageDialog(dialog, "Funcionário adicionado com sucesso!");
             }
         });
         
         btnDemitir.addActionListener(e -> {
             Funcionario funcSelecionado = funcList.getSelectedValue();
             if (funcSelecionado != null) {
-                funcionarioService.demitir(funcSelecionado.getId());
+                funcionarioService.excluir(funcSelecionado.getId());
                 listModel.removeElement(funcSelecionado);
+                JOptionPane.showMessageDialog(dialog, "Funcionário demitido com sucesso!");
             } else {
                 JOptionPane.showMessageDialog(dialog, "Selecione um funcionário para demitir.");
             }
@@ -463,10 +472,10 @@ public class CineAppGUI {
 
         if (escolha == null) return;
         
-        JTextArea textArea = new JTextArea(20, 50);
-        
-        // Esta parte ainda imprime no console, o ideal seria capturar a saída para o JTextArea
-        System.out.println("--- O RELATÓRIO SERÁ EXIBIDO NO CONSOLE ---");
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(baos);
+        PrintStream old = System.out;
+        System.setOut(ps);
         
         switch (escolha) {
             case "Vendas por Filme": relatorioService.gerarRelatorioVendasPorFilme(); break;
@@ -476,7 +485,12 @@ public class CineAppGUI {
             case "Receita Total": relatorioService.gerarRelatorioReceitaTotal(); break;
         }
         
-        JOptionPane.showMessageDialog(frame, "Relatório gerado no console.", "Relatório", JOptionPane.INFORMATION_MESSAGE);
+        System.out.flush();
+        System.setOut(old);
+        
+        JTextArea textArea = new JTextArea(baos.toString());
+        textArea.setEditable(false);
+        JOptionPane.showMessageDialog(frame, new JScrollPane(textArea), "Relatório - " + escolha, JOptionPane.INFORMATION_MESSAGE);
     }
     
     private void mostrarDialogoValidarIngresso() {

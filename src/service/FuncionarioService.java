@@ -3,32 +3,34 @@ package service;
 import model.Funcionario;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-public class FuncionarioService {
+public class FuncionarioService implements Gerenciavel<Funcionario> {
     private final List<Funcionario> funcionarios = new ArrayList<>();
     private Long proximoId = 1L;
 
     public FuncionarioService() {
-        adicionar("João Silva", "Gerente");
-        adicionar("Maria Oliveira", "Atendente de Bilheteria");
-        adicionar("Carlos Pereira", "Projecionista");
-        adicionar("Ana Costa", "Atendente da Bomboniere");
-        adicionar("Pedro Souza", "Limpeza");
+        adicionar(new Funcionario(0L, "João Silva", "Gerente"));
+        adicionar(new Funcionario(0L, "Maria Oliveira", "Atendente de Bilheteria"));
+        adicionar(new Funcionario(0L, "Carlos Pereira", "Projecionista"));
+        adicionar(new Funcionario(0L, "Ana Costa", "Atendente da Bomboniere"));
+        adicionar(new Funcionario(0L, "Pedro Souza", "Limpeza"));
     }
 
-    public void adicionar(String nome, String funcao) {
-        if (nome == null || nome.isBlank() || funcao == null || funcao.isBlank()) {
+    @Override
+    public void adicionar(Funcionario funcionario) {
+        if (funcionario.getNome() == null || funcionario.getNome().isBlank() || funcionario.getFuncao() == null || funcionario.getFuncao().isBlank()) {
             throw new RuntimeException("Nome e função são obrigatórios.");
         }
-        Funcionario funcionario = new Funcionario(proximoId++, nome, funcao);
+        funcionario.setId(proximoId++);
         funcionarios.add(funcionario);
     }
 
+    @Override
     public List<Funcionario> listar() {
         return funcionarios;
     }
 
+    @Override
     public Funcionario buscarPorId(Long id) {
         return funcionarios.stream()
                 .filter(f -> f.getId().equals(id))
@@ -36,18 +38,15 @@ public class FuncionarioService {
                 .orElseThrow(() -> new RuntimeException("Funcionário não encontrado."));
     }
 
-    public void demitir(Long id) {
+    @Override
+    public void excluir(Long id) {
         Funcionario funcionario = buscarPorId(id);
         funcionarios.remove(funcionario);
-        System.out.println("✅ Funcionário demitido com sucesso!");
     }
 
     public void elegerFuncionarioDoMes(Long id) {
         Funcionario eleito = buscarPorId(id);
-        
         funcionarios.forEach(f -> f.setEhFuncionarioDoMes(false));
-        
         eleito.setEhFuncionarioDoMes(true);
-        System.out.println("✅ " + eleito.getNome() + " foi eleito(a) o(a) funcionário(a) do mês!");
     }
 }
