@@ -1,6 +1,6 @@
 package model;
 
-public class Funcionario {
+public class Funcionario implements IImprimivel {
     private Long id;
     private String nome;
     private String funcao;
@@ -37,5 +37,16 @@ public class Funcionario {
     public String toString() {
         String status = ehFuncionarioDoMes ? "⭐ FUNCIONÁRIO DO MÊS ⭐" : "";
         return "Funcionario [ID=" + id + ", Nome='" + nome + "', Função='" + funcao + "'] " + status;
+    }
+
+    @Override
+    public String getDetalhesFormatados() {
+        String status = ehFuncionarioDoMes ? "\n⭐ FUNCIONÁRIO DO MÊS ⭐" : "";
+        return "--- Detalhes do Funcionário ---\n" +
+               "ID: " + this.id + "\n" +
+               "Nome: " + this.nome + "\n" +
+               "Função: " + this.funcao +
+               status + "\n" +
+               "-------------------------------";
     }
 }

@@ -1,6 +1,6 @@
 package model;
 
-public class Filme {
+public class Filme implements IImprimivel {
     private Long id;
     private String titulo;
     private String sinopse;
@@ -32,5 +32,16 @@ public class Filme {
     @Override
     public String toString() {
         return "Filme [ID=" + id + ", Título='" + titulo + "']";
+    }
+
+    @Override
+    public String getDetalhesFormatados() {
+        return "--- Detalhes do Filme ---\n" +
+               "ID: " + this.id + "\n" +
+               "Título: " + this.titulo + "\n" +
+               "Sinopse: " + this.sinopse + "\n" +
+               "Gênero: " + this.genero + "\n" +
+               "Classificação: " + this.classificacaoIndicativa + " anos\n" +
+               "-------------------------";
     }
 }

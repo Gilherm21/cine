@@ -2,10 +2,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
-
 import model.Administrador;
 import model.Cliente;
 import model.Filme;
+import model.Funcionario;
+import model.IImprimivel;
 import model.Ingresso;
 import model.Sessao;
 import model.Usuario;
@@ -308,6 +309,7 @@ public class Main {
             System.out.println("4 - Gerenciar Funcionários");
             System.out.println("5 - Gerar Relatórios");
             System.out.println("6 - Validar QR Code de Ingresso");
+            System.out.println("7 - Testar Impressão (Interface)");
             System.out.println("0 - Deslogar");
             System.out.print("Escolha uma opção: ");
             try {
@@ -321,6 +323,7 @@ public class Main {
                     case 4: gerenciarFuncionarios(); break;
                     case 5: gerarRelatorios(); break;
                     case 6: validarIngresso(); break;
+                    case 7: testarImpressao(); break;
                     case 0:
                         usuarioLogado = null;
                         break;
@@ -596,6 +599,39 @@ public class Main {
             default:
                 System.out.println("❌ Opção inválida.");
                 break;
+        }
+    }
+
+    private void imprimir(IImprimivel objeto) {
+        objeto.imprimirDetalhes();
+    }
+
+    private void testarImpressao() {
+        System.out.println("\n--- Testando Impressão com Interface IImprimivel ---");
+        
+        try {
+            if (!filmeService.listar().isEmpty()) {
+                Filme filme = filmeService.buscarPorId(1L);
+                imprimir(filme);
+            } else {
+                 System.out.println("\nNenhum filme cadastrado para teste.");
+            }
+
+            if (!funcionarioService.listar().isEmpty()) {
+                Funcionario funcionario = funcionarioService.buscarPorId(1L);
+                imprimir(funcionario);
+            } else {
+                System.out.println("\nNenhum funcionário cadastrado para teste.");
+            }
+            
+            if (!clienteService.listar().isEmpty()) {
+                Cliente cliente = clienteService.listar().get(0);
+                imprimir(cliente);
+            } else {
+                System.out.println("\nCadastre um cliente primeiro para testar a impressão de cliente.");
+            }
+        } catch(Exception e) {
+            System.out.println("Ocorreu um erro ao testar a impressão: " + e.getMessage());
         }
     }
 }

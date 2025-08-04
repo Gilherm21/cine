@@ -95,7 +95,7 @@ public class CineAppGUI {
 
     private void initialize() {
         frame = new JFrame("Cine-System");
-        frame.setBounds(100, 100, 500, 400);
+        frame.setBounds(100, 100, 500, 450);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         mostrarPainelLogin();
@@ -181,7 +181,7 @@ public class CineAppGUI {
     
     private void mostrarPainelAdmin() {
         frame.setTitle("Painel do Administrador");
-        JPanel panel = new JPanel(new GridLayout(4, 2, 10, 10));
+        JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         JButton btnGerenciarFilmes = new JButton("Gerenciar Filmes");
@@ -199,6 +199,9 @@ public class CineAppGUI {
         JButton btnGerenciarFunc = new JButton("Gerenciar Funcionários");
         btnGerenciarFunc.addActionListener(e -> mostrarDialogoGerenciarFuncionarios());
 
+        JButton btnTestarInterface = new JButton("Ver Detalhes (Interface)");
+        btnTestarInterface.addActionListener(e -> mostrarDialogoDetalhesInterface());
+
         JButton btnLogout = new JButton("Logout");
         btnLogout.addActionListener(e -> logout());
         
@@ -207,9 +210,31 @@ public class CineAppGUI {
         panel.add(btnGerenciarFunc);
         panel.add(btnGerarRelatorios);
         panel.add(btnValidarIngresso);
+        panel.add(btnTestarInterface);
+        panel.add(new JLabel());
         panel.add(btnLogout);
         
         mostrarPainel(panel);
+    }
+
+    private void mostrarDialogoDetalhesInterface() {
+        try {
+            Filme filme = filmeService.buscarPorId(1L);
+            Funcionario funcionario = funcionarioService.buscarPorId(1L);
+
+            String detalhesFilme = filme.getDetalhesFormatados();
+            String detalhesFuncionario = funcionario.getDetalhesFormatados();
+
+            String mensagemFinal = detalhesFilme + "\n\n" + detalhesFuncionario;
+
+            JTextArea textArea = new JTextArea(mensagemFinal);
+            textArea.setEditable(false);
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            JOptionPane.showMessageDialog(frame, scrollPane, "Detalhes (via Interface IImprimivel)", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (Exception e) {
+             JOptionPane.showMessageDialog(frame, "Erro ao buscar dados para exibição: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void mostrarPainelCartaz() {
@@ -243,13 +268,10 @@ public class CineAppGUI {
         dialog.setLayout(new BorderLayout(10, 10));
         dialog.setLocationRelativeTo(frame);
 
-        JTextArea infoArea = new JTextArea();
+        JTextArea infoArea = new JTextArea(filme.getDetalhesFormatados());
         infoArea.setEditable(false);
         infoArea.setLineWrap(true);
         infoArea.setWrapStyleWord(true);
-        infoArea.setText("Título: " + filme.getTitulo() + "\n\n" +
-                         "Sinopse: " + filme.getSinopse() + "\n\n" +
-                         "Classificação: " + filme.getClassificacaoIndicativa() + " anos");
         dialog.add(new JScrollPane(infoArea), BorderLayout.NORTH);
 
         DefaultListModel<Sessao> listModel = new DefaultListModel<>();
@@ -289,7 +311,7 @@ public class CineAppGUI {
                     assentosArea.setEditable(false);
                     JScrollPane scrollPane = new JScrollPane(assentosArea);
                     
-                    assento = JOptionPane.showInputDialog(frame, new Object[]{"MAPA DE ASSENTOS - INGRESSO " + i, scrollPane}, "Escolha um assento vago (Ex: A1):", JOptionPane.PLAIN_MESSAGE);
+                    assento = (String) JOptionPane.showInputDialog(frame, new Object[]{"MAPA DE ASSENTOS - INGRESSO " + i, scrollPane}, "Escolha um assento vago (Ex: A1):", JOptionPane.PLAIN_MESSAGE, null, null, "");
                     
                     if (assento == null) return;
                     
@@ -463,10 +485,7 @@ public class CineAppGUI {
 
         if (escolha == null) return;
         
-        JTextArea textArea = new JTextArea(20, 50);
-        
-        // Esta parte ainda imprime no console, o ideal seria capturar a saída para o JTextArea
-        System.out.println("--- O RELATÓRIO SERÁ EXIBIDO NO CONSOLE ---");
+        System.out.println("\n--- O RELATÓRIO A SEGUIR SERÁ EXIBIDO APENAS NO CONSOLE ---");
         
         switch (escolha) {
             case "Vendas por Filme": relatorioService.gerarRelatorioVendasPorFilme(); break;
@@ -476,7 +495,7 @@ public class CineAppGUI {
             case "Receita Total": relatorioService.gerarRelatorioReceitaTotal(); break;
         }
         
-        JOptionPane.showMessageDialog(frame, "Relatório gerado no console.", "Relatório", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(frame, "Relatório gerado no console do seu editor/terminal.", "Relatório Gerado", JOptionPane.INFORMATION_MESSAGE);
     }
     
     private void mostrarDialogoValidarIngresso() {

@@ -1,6 +1,6 @@
 package model;
 
-public class Cliente extends Usuario {
+public class Cliente extends Usuario implements IImprimivel {
     private Long id;
     private String nome;
     private String cpf;
@@ -58,5 +58,14 @@ public class Cliente extends Usuario {
     @Override
     public String toString() {
         return "Cliente [ID=" + id + ", Nome='" + nome + "', CPF='" + cpf + "']";
+    }
+
+    @Override
+    public String getDetalhesFormatados() {
+        return "--- Detalhes do Cliente ---\n" +
+               "ID: " + this.id + "\n" +
+               "Nome: " + this.nome + "\n" +
+               "Email: " + this.email + "\n" +
+               "---------------------------";
     }
 }
