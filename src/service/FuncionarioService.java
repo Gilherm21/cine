@@ -107,7 +107,7 @@ public class FuncionarioService {
         String sql = "DELETE FROM funcionarios WHERE id = ?";
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            buscarPorId(id); // Verifica se existe antes de deletar
+            buscarPorId(id);
             pstmt.setLong(1, id);
             pstmt.executeUpdate();
             System.out.println("✅ Funcionário demitido com sucesso!");
